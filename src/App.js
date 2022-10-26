@@ -89,6 +89,7 @@ function App() {
           || [cardAttr1, cardAttr2, cardAttr3].some((attr) => attr > maxIndividualValue)
         }
         onSaveButtonClick={ onSaveButtonClick }
+        hasTrunfo={ cardSaved.some((card) => card.trunfo === true) }
       />
       <Card
         cardName={ cardName }
