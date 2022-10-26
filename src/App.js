@@ -15,6 +15,7 @@ function App() {
   const [hasTrunfoState, setHasTrunfoState] = useState(false);
   const [filterName, setFilterName] = useState('');
   const [filterRare, setFilterRare] = useState('todas');
+  const [filterTrunfo, setFilterTrunfo] = useState(false);
 
   const hasTrunfo = () => {
     if (cardSaved.length === 0) setHasTrunfoState(false);
@@ -74,6 +75,7 @@ function App() {
     setCardName('');
     setCardDescription('');
     setCardRare('normal');
+    setCardTrunfo(false);
   };
 
   const handleDeleteCard = (element) => {
@@ -82,13 +84,18 @@ function App() {
     hasTrunfo();
   };
 
-  const filteredCardsName = cardSaved.filter((card) => card.name.toLowerCase().includes(filterName.toLowerCase()));
+  const filteredCardsName = cardSaved
+    .filter((card) => card.name.toLowerCase().includes(filterName.toLowerCase()));
 
   const filteredCardsRare = filteredCardsName.filter(
     (card) => card.rare === filterRare || filterRare === 'todas',
   );
 
-  const filteredCards = filteredCardsRare;
+  const filteredCardsTrunfo = cardSaved.filter(
+    (card) => card.trunfo === true,
+  );
+
+  const filteredCards = filterTrunfo ? filteredCardsTrunfo : filteredCardsRare;
 
   const maxSumValue = 210;
   const maxIndividualValue = 90;
@@ -133,6 +140,7 @@ function App() {
       />
       <input
         placeholder="Filtrar por nome"
+        disabled={ filterTrunfo }
         type="text"
         data-testid="name-filter"
         value={ filterName }
@@ -140,6 +148,7 @@ function App() {
       />
       <select
         value={ filterRare }
+        disabled={ filterTrunfo }
         onChange={ (e) => setFilterRare(e.target.value) }
         data-testid="rare-filter"
       >
@@ -148,6 +157,12 @@ function App() {
         <option value="raro">Raro</option>
         <option value="muito raro">Muito Raro</option>
       </select>
+      <input
+        type="checkbox"
+        data-testid="trunfo-filter"
+        checked={ filterTrunfo }
+        onChange={ (e) => setFilterTrunfo(e.target.checked) }
+      />
       {cardSaved.length > 0 ? (
         <ul>
           {filteredCards.map((card, index) => (
