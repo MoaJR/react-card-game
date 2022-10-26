@@ -13,6 +13,7 @@ function App() {
   const [cardTrunfo, setCardTrunfo] = useState(false);
   const [cardSaved, setCardSaved] = useState([]);
   const [hasTrunfoState, setHasTrunfoState] = useState(false);
+  const [filterName, setFilterName] = useState('');
 
   const hasTrunfo = () => {
     if (cardSaved.length === 0) setHasTrunfoState(false);
@@ -80,6 +81,9 @@ function App() {
     hasTrunfo();
   };
 
+  const filteredCardsName = cardSaved
+    .filter((card) => card.name.toLowerCase().includes(filterName.toLowerCase()));
+
   const maxSumValue = 210;
   const maxIndividualValue = 90;
 
@@ -121,9 +125,16 @@ function App() {
         cardRare={ cardRare }
         cardTrunfo={ cardTrunfo }
       />
+      <input
+        placeholder="Filtrar por nome"
+        type="text"
+        data-testid="name-filter"
+        value={ filterName }
+        onChange={ (e) => setFilterName(e.target.value) }
+      />
       {cardSaved.length > 0 ? (
         <ul>
-          {cardSaved.map((card, index) => (
+          {filteredCardsName.map((card, index) => (
             <li key={ `${index}${card.cardName}` }>
               <Card
                 cardName={ card.name }
