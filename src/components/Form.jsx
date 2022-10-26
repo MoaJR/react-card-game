@@ -53,6 +53,7 @@ function Form({
             type="number"
             name="cardAttr1"
             min={ 0 }
+            max={ 90 }
             data-testid="attr1-input"
             value={ cardAttr1 }
             onChange={ onInputChange }
@@ -64,6 +65,7 @@ function Form({
             type="number"
             name="cardAttr2"
             min={ 0 }
+            max={ 90 }
             data-testid="attr2-input"
             value={ cardAttr2 }
             onChange={ onInputChange }
@@ -75,6 +77,7 @@ function Form({
             type="number"
             name="cardAttr3"
             min={ 0 }
+            max={ 90 }
             data-testid="attr3-input"
             value={ cardAttr3 }
             onChange={ onInputChange }

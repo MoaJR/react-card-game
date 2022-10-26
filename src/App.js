@@ -9,7 +9,7 @@ function App() {
   const [cardAttr2, setCardAttr2] = useState(0);
   const [cardAttr3, setCardAttr3] = useState(0);
   const [cardImage, setCardImage] = useState('https://iili.io/DsQ0qg.png');
-  const [cardRare, setCardRare] = useState('normal');
+  const [cardRare, setCardRare] = useState();
   const [cardTrunfo, setCardTrunfo] = useState(false);
 
   const onInputChange = (event) => {
@@ -40,6 +40,9 @@ function App() {
     }
   };
 
+  const maxSumValue = 210;
+  const maxIndividualValue = 90;
+
   return (
     <div>
       <Form
@@ -52,6 +55,16 @@ function App() {
         cardImage={ cardImage }
         cardRare={ cardRare }
         cardTrunfo={ cardTrunfo }
+        isSaveButtonDisabled={
+          !cardName
+          || !cardImage
+          || !cardDescription
+          || ((parseInt(cardAttr1, 10)
+          + parseInt(cardAttr2, 10)
+          + parseInt(cardAttr3, 10)) > maxSumValue)
+          || [cardAttr1, cardAttr2, cardAttr3].some((attr) => attr < 0)
+          || [cardAttr1, cardAttr2, cardAttr3].some((attr) => attr > maxIndividualValue)
+        }
       />
       <Card
         cardName={ cardName }
