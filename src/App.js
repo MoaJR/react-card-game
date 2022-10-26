@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Card from './components/Card';
 import Form from './components/Form';
 
@@ -12,9 +12,20 @@ function App() {
   const [cardRare, setCardRare] = useState();
   const [cardTrunfo, setCardTrunfo] = useState(false);
   const [cardSaved, setCardSaved] = useState([]);
+  const [hasTrunfoState, setHasTrunfoState] = useState(false);
+
+  const hasTrunfo = () => {
+    if (cardSaved.length === 0) setHasTrunfoState(false);
+    if (cardSaved.some((card) => card.trunfo === true)) {
+      setHasTrunfoState(true);
+    } else {
+      setHasTrunfoState(false);
+    }
+  };
 
   const onInputChange = (event) => {
     const { name, value, checked } = event.target;
+    hasTrunfo();
     if (name === 'cardName') {
       setCardName(value);
     }
@@ -39,6 +50,7 @@ function App() {
     if (name === 'cardTrunfo') {
       setCardTrunfo(checked);
     }
+    hasTrunfo();
   };
 
   const onSaveButtonClick = () => {
@@ -52,8 +64,7 @@ function App() {
       rare: cardRare,
       trunfo: cardTrunfo,
     };
-    setCardSaved([...cardSaved, card]);
-
+    setCardSaved((prev) => [...prev, card]);
     setCardAttr1(0);
     setCardAttr2(0);
     setCardAttr3(0);
@@ -63,8 +74,18 @@ function App() {
     setCardRare('normal');
   };
 
+  const handleDeleteCard = (element) => {
+    const cards = cardSaved.filter((card) => card.name !== element.target.value);
+    setCardSaved(cards);
+    hasTrunfo();
+  };
+
   const maxSumValue = 210;
   const maxIndividualValue = 90;
+
+  useEffect(() => {
+    hasTrunfo();
+  }, [cardSaved]);
 
   return (
     <div>
@@ -82,14 +103,13 @@ function App() {
           !cardName
           || !cardImage
           || !cardDescription
-          || ((parseInt(cardAttr1, 10)
-          + parseInt(cardAttr2, 10)
-          + parseInt(cardAttr3, 10)) > maxSumValue)
+          || parseInt(cardAttr1, 10) + parseInt(cardAttr2, 10) + parseInt(cardAttr3, 10)
+            > maxSumValue
           || [cardAttr1, cardAttr2, cardAttr3].some((attr) => attr < 0)
           || [cardAttr1, cardAttr2, cardAttr3].some((attr) => attr > maxIndividualValue)
         }
         onSaveButtonClick={ onSaveButtonClick }
-        hasTrunfo={ cardSaved.some((card) => card.trunfo === true) }
+        hasTrunfo={ hasTrunfoState }
       />
       <Card
         cardName={ cardName }
@@ -101,6 +121,32 @@ function App() {
         cardRare={ cardRare }
         cardTrunfo={ cardTrunfo }
       />
+      {cardSaved.length > 0 ? (
+        <ul>
+          {cardSaved.map((card, index) => (
+            <li key={ `${index}${card.cardName}` }>
+              <Card
+                cardName={ card.name }
+                cardDescription={ card.description }
+                cardAttr1={ card.attr1 }
+                cardAttr2={ card.attr2 }
+                cardAttr3={ card.attr3 }
+                cardImage={ card.image }
+                cardRare={ card.rare }
+                cardTrunfo={ card.trunfo }
+              />
+              <button
+                type="button"
+                data-testid="delete-button"
+                value={ card.name }
+                onClick={ handleDeleteCard }
+              >
+                Excluir
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : null}
     </div>
   );
 }
