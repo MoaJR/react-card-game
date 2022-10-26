@@ -9,11 +9,12 @@ function App() {
   const [cardAttr2, setCardAttr2] = useState(0);
   const [cardAttr3, setCardAttr3] = useState(0);
   const [cardImage, setCardImage] = useState('https://iili.io/DsQ0qg.png');
-  const [cardRare, setCardRare] = useState();
+  const [cardRare, setCardRare] = useState('normal');
   const [cardTrunfo, setCardTrunfo] = useState(false);
   const [cardSaved, setCardSaved] = useState([]);
   const [hasTrunfoState, setHasTrunfoState] = useState(false);
   const [filterName, setFilterName] = useState('');
+  const [filterRare, setFilterRare] = useState('todas');
 
   const hasTrunfo = () => {
     if (cardSaved.length === 0) setHasTrunfoState(false);
@@ -81,8 +82,13 @@ function App() {
     hasTrunfo();
   };
 
-  const filteredCardsName = cardSaved
-    .filter((card) => card.name.toLowerCase().includes(filterName.toLowerCase()));
+  const filteredCardsName = cardSaved.filter((card) => card.name.toLowerCase().includes(filterName.toLowerCase()));
+
+  const filteredCardsRare = filteredCardsName.filter(
+    (card) => card.rare === filterRare || filterRare === 'todas',
+  );
+
+  const filteredCards = filteredCardsRare;
 
   const maxSumValue = 210;
   const maxIndividualValue = 90;
@@ -132,9 +138,19 @@ function App() {
         value={ filterName }
         onChange={ (e) => setFilterName(e.target.value) }
       />
+      <select
+        value={ filterRare }
+        onChange={ (e) => setFilterRare(e.target.value) }
+        data-testid="rare-filter"
+      >
+        <option value="todas">Todas</option>
+        <option value="normal">Normal</option>
+        <option value="raro">Raro</option>
+        <option value="muito raro">Muito Raro</option>
+      </select>
       {cardSaved.length > 0 ? (
         <ul>
-          {filteredCardsName.map((card, index) => (
+          {filteredCards.map((card, index) => (
             <li key={ `${index}${card.cardName}` }>
               <Card
                 cardName={ card.name }
