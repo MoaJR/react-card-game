@@ -1,5 +1,4 @@
 import React from 'react';
-import { PropTypes } from 'prop-types';
 
 import '../style/Form.scss';
 
@@ -16,6 +15,8 @@ function Form({
   isSaveButtonDisabled,
   onInputChange,
   onSaveButtonClick,
+  handleSearchButton,
+  handleRandomButton,
 }) {
   const onSubmit = (e) => {
     e.preventDefault();
@@ -38,8 +39,12 @@ function Form({
             onChange={ onInputChange }
           />
         </label>
+        <div className="searchButtonsContainer">
+          <button type="button" onClick={ handleSearchButton }>Pesquisar</button>
+          <button type="button" onClick={ handleRandomButton }>Random</button>
+        </div>
         <label htmlFor="cardDescription">
-          Descrição
+          Tipo(s)
           <textarea
             name="cardDescription"
             data-testid="description-input"
@@ -48,48 +53,35 @@ function Form({
           />
         </label>
         <label htmlFor="cardAttr1">
-          Atributo 1
+          HP
           <input
             type="number"
             name="cardAttr1"
             min={ 0 }
-            max={ 90 }
             data-testid="attr1-input"
             value={ cardAttr1 }
             onChange={ onInputChange }
           />
         </label>
         <label htmlFor="cardAttr2">
-          Atributo 2
+          Ataque
           <input
             type="number"
             name="cardAttr2"
             min={ 0 }
-            max={ 90 }
             data-testid="attr2-input"
             value={ cardAttr2 }
             onChange={ onInputChange }
           />
         </label>
         <label htmlFor="cardAttr3">
-          Atributo 3
+          Defesa
           <input
             type="number"
             name="cardAttr3"
             min={ 0 }
-            max={ 90 }
             data-testid="attr3-input"
             value={ cardAttr3 }
-            onChange={ onInputChange }
-          />
-        </label>
-        <label htmlFor="cardImage">
-          Imagem
-          <input
-            type="text"
-            name="cardImage"
-            data-testid="image-input"
-            value={ cardImage }
             onChange={ onInputChange }
           />
         </label>
@@ -108,10 +100,10 @@ function Form({
         </label>
         {
           hasTrunfo ? (
-            <p>Você já tem um Super Trunfo em seu baralho</p>
+            <p>Você já tem uma Super Carta em seu baralho</p>
           ) : (
             <label htmlFor="cardTrunfo">
-              Super Trunfo
+              Super Carta
               <input
                 type="checkbox"
                 name="cardTrunfo"
@@ -134,20 +126,5 @@ function Form({
     </div>
   );
 }
-
-Form.propTypes = {
-  cardName: PropTypes.string.isRequired,
-  cardDescription: PropTypes.string.isRequired,
-  cardAttr1: PropTypes.number.isRequired,
-  cardAttr2: PropTypes.number.isRequired,
-  cardAttr3: PropTypes.number.isRequired,
-  cardImage: PropTypes.string.isRequired,
-  cardRare: PropTypes.string.isRequired,
-  cardTrunfo: PropTypes.bool.isRequired,
-  hasTrunfo: PropTypes.bool.isRequired,
-  isSaveButtonDisabled: PropTypes.bool.isRequired,
-  onInputChange: PropTypes.func.isRequired,
-  onSaveButtonClick: PropTypes.func.isRequired,
-};
 
 export default Form;

@@ -1,21 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import Card from './components/Card';
-import Form from './components/Form';
+import { SearchArea } from "./components/SearchArea";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+
+import { colors } from "./settings/colors";
+import { List } from "./components/List";
+import Card from "./components/Card";
+import Form from "./components/Form";
+import "./style/App.scss";
 
 function App() {
-  const [cardName, setCardName] = useState('');
-  const [cardDescription, setCardDescription] = useState('');
+  const [cardName, setCardName] = useState("");
+  const [cardDescription, setCardDescription] = useState("");
   const [cardAttr1, setCardAttr1] = useState(0);
   const [cardAttr2, setCardAttr2] = useState(0);
   const [cardAttr3, setCardAttr3] = useState(0);
-  const [cardImage, setCardImage] = useState('https://iili.io/DsQ0qg.png');
-  const [cardRare, setCardRare] = useState('normal');
+  const [cardImage, setCardImage] = useState(null);
+  const [cardRare, setCardRare] = useState("normal");
   const [cardTrunfo, setCardTrunfo] = useState(false);
   const [cardSaved, setCardSaved] = useState([]);
   const [hasTrunfoState, setHasTrunfoState] = useState(false);
-  const [filterName, setFilterName] = useState('');
-  const [filterRare, setFilterRare] = useState('todas');
+  const [filterName, setFilterName] = useState("");
+  const [filterRare, setFilterRare] = useState("todas");
   const [filterTrunfo, setFilterTrunfo] = useState(false);
+  const [data, setData] = useState([]);
+  const [randomData, setRandomData] = useState([]);
+  const [cardColor, setCardColor] = useState({ background: "#fff", color: "#000" });
 
   const hasTrunfo = () => {
     if (cardSaved.length === 0) setHasTrunfoState(false);
@@ -28,32 +37,30 @@ function App() {
 
   const onInputChange = (event) => {
     const { name, value, checked } = event.target;
-    hasTrunfo();
-    if (name === 'cardName') {
+    if (name === "cardName") {
       setCardName(value);
     }
-    if (name === 'cardDescription') {
+    if (name === "cardDescription") {
       setCardDescription(value);
     }
-    if (name === 'cardAttr1') {
+    if (name === "cardAttr1") {
       setCardAttr1(value);
     }
-    if (name === 'cardAttr2') {
+    if (name === "cardAttr2") {
       setCardAttr2(value);
     }
-    if (name === 'cardAttr3') {
+    if (name === "cardAttr3") {
       setCardAttr3(value);
     }
-    if (name === 'cardImage') {
+    if (name === "cardImage") {
       setCardImage(value);
     }
-    if (name === 'cardRare') {
+    if (name === "cardRare") {
       setCardRare(value);
     }
-    if (name === 'cardTrunfo') {
+    if (name === "cardTrunfo") {
       setCardTrunfo(checked);
     }
-    hasTrunfo();
   };
 
   const onSaveButtonClick = () => {
@@ -66,129 +73,167 @@ function App() {
       image: cardImage,
       rare: cardRare,
       trunfo: cardTrunfo,
+      color: cardColor,
     };
     setCardSaved((prev) => [...prev, card]);
     setCardAttr1(0);
     setCardAttr2(0);
     setCardAttr3(0);
-    setCardImage('');
-    setCardName('');
-    setCardDescription('');
-    setCardRare('normal');
+    setCardName("");
+    setCardDescription("");
+    setCardImage("");
+    setCardRare("normal");
     setCardTrunfo(false);
+    setCardColor({ background: "#fff", color: "#fff" });
   };
 
   const handleDeleteCard = (element) => {
     const cards = cardSaved.filter((card) => card.name !== element.target.value);
     setCardSaved(cards);
-    hasTrunfo();
   };
 
-  const filteredCardsName = cardSaved
-    .filter((card) => card.name.toLowerCase().includes(filterName.toLowerCase()));
+  const filteredCardsName = cardSaved.filter((card) =>
+    card.name.toLowerCase().includes(filterName.toLowerCase())
+  );
 
   const filteredCardsRare = filteredCardsName.filter(
-    (card) => card.rare === filterRare || filterRare === 'todas',
+    (card) => card.rare === filterRare || filterRare === "todas"
   );
 
-  const filteredCardsTrunfo = cardSaved.filter(
-    (card) => card.trunfo === true,
-  );
+  const filteredCardsTrunfo = cardSaved.filter((card) => card.trunfo === true);
 
   const filteredCards = filterTrunfo ? filteredCardsTrunfo : filteredCardsRare;
-
-  const maxSumValue = 210;
-  const maxIndividualValue = 90;
 
   useEffect(() => {
     hasTrunfo();
   }, [cardSaved]);
 
+  const handleSearchButton = async () => {
+    const fetchData = async (name) => {
+      name = cardName.toLocaleLowerCase();
+      const result = await axios(`https://pokeapi.co/api/v2/pokemon/${name}`);
+      setData(result.data);
+    };
+    fetchData().catch((error) => {
+      alert("Pokemon não encontrado\nTente novamente");
+      console.log(error);
+    });
+  };
+
+  const handleRandomButton = async () => {
+    const fetchData = async () => {
+      const result = await axios(
+        "https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0"
+      );
+      setRandomData(result.data);
+    };
+    fetchData().catch((error) => {
+      alert("Erro, Tente novamente");
+      console.log(error);
+    });
+  };
+
+  const handleNullSprites = (dataFunc) => {
+    let imgSprite = dataFunc.sprites.front_default;
+    if (dataFunc.sprites.other.dream_world.front_default !== null) {
+      imgSprite = dataFunc.sprites.other.dream_world.front_default;
+    }
+    if (dataFunc.sprites.other["official-artwork"].front_default !== null) {
+      imgSprite = dataFunc.sprites.other["official-artwork"].front_default;
+    }
+    return imgSprite;
+  };
+
+  const getColor = (info) => {
+    const infos = info.split(" ");
+    if (colors[infos[0]]) setCardColor(colors[infos[0].toLowerCase()]);
+    else setCardColor({ background: "#fff", color: "#000" });
+  };
+
+  const fetchedPokemon = () => {
+    if (data.name) {
+      setCardImage(handleNullSprites(data));
+      setCardAttr1(data.stats[0].base_stat);
+      setCardAttr2(data.stats[1].base_stat);
+      setCardAttr3(data.stats[2].base_stat);
+      data.types.forEach((type) => {
+        setCardDescription((`${type.type.name}`));
+      });
+      getColor(data.types[0].type.name);
+    }
+  };
+
+  const fetchedRandomPokemon = () => {
+    if (randomData.results) {
+      const random = Math.floor(Math.random() * randomData.results.length);
+      setCardName(randomData.results[random].name);
+      setCardImage(null);
+    }
+  };
+
+  useEffect(() => {
+    getColor(cardDescription);
+  }, [cardDescription]);
+
+  useEffect(() => {
+    setCardColor({ background: "#fff", color: "#000" });
+    setCardDescription("");
+    fetchedRandomPokemon();
+  }, [randomData]);
+
+  useEffect(() => {
+    setCardColor({ background: "#fff", color: "#000" });
+    setCardDescription("");
+    fetchedPokemon();
+  }, [data]);
+
   return (
-    <div>
-      <Form
-        onInputChange={ onInputChange }
-        cardName={ cardName }
-        cardDescription={ cardDescription }
-        cardAttr1={ cardAttr1 }
-        cardAttr2={ cardAttr2 }
-        cardAttr3={ cardAttr3 }
-        cardImage={ cardImage }
-        cardRare={ cardRare }
-        cardTrunfo={ cardTrunfo }
-        isSaveButtonDisabled={
-          !cardName
-          || !cardImage
-          || !cardDescription
-          || parseInt(cardAttr1, 10) + parseInt(cardAttr2, 10) + parseInt(cardAttr3, 10)
-            > maxSumValue
-          || [cardAttr1, cardAttr2, cardAttr3].some((attr) => attr < 0)
-          || [cardAttr1, cardAttr2, cardAttr3].some((attr) => attr > maxIndividualValue)
-        }
-        onSaveButtonClick={ onSaveButtonClick }
-        hasTrunfo={ hasTrunfoState }
-      />
-      <Card
-        cardName={ cardName }
-        cardDescription={ cardDescription }
-        cardAttr1={ cardAttr1 }
-        cardAttr2={ cardAttr2 }
-        cardAttr3={ cardAttr3 }
-        cardImage={ cardImage }
-        cardRare={ cardRare }
-        cardTrunfo={ cardTrunfo }
-      />
-      <input
-        placeholder="Filtrar por nome"
-        disabled={ filterTrunfo }
-        type="text"
-        data-testid="name-filter"
-        value={ filterName }
-        onChange={ (e) => setFilterName(e.target.value) }
-      />
-      <select
-        value={ filterRare }
-        disabled={ filterTrunfo }
-        onChange={ (e) => setFilterRare(e.target.value) }
-        data-testid="rare-filter"
-      >
-        <option value="todas">Todas</option>
-        <option value="normal">Normal</option>
-        <option value="raro">Raro</option>
-        <option value="muito raro">Muito Raro</option>
-      </select>
-      <input
-        type="checkbox"
-        data-testid="trunfo-filter"
-        checked={ filterTrunfo }
-        onChange={ (e) => setFilterTrunfo(e.target.checked) }
-      />
-      {cardSaved.length > 0 ? (
-        <ul>
-          {filteredCards.map((card, index) => (
-            <li key={ `${index}${card.cardName}` }>
-              <Card
-                cardName={ card.name }
-                cardDescription={ card.description }
-                cardAttr1={ card.attr1 }
-                cardAttr2={ card.attr2 }
-                cardAttr3={ card.attr3 }
-                cardImage={ card.image }
-                cardRare={ card.rare }
-                cardTrunfo={ card.trunfo }
-              />
-              <button
-                type="button"
-                data-testid="delete-button"
-                value={ card.name }
-                onClick={ handleDeleteCard }
-              >
-                Excluir
-              </button>
-            </li>
-          ))}
-        </ul>
-      ) : null}
+    <div className="App">
+      <div className="masterContaienr">
+        <div className="topContainer">
+          <Form
+            onInputChange={onInputChange}
+            cardName={cardName}
+            cardDescription={cardDescription}
+            cardAttr1={cardAttr1}
+            cardAttr2={cardAttr2}
+            cardAttr3={cardAttr3}
+            cardImage={cardImage}
+            cardRare={cardRare}
+            cardTrunfo={cardTrunfo}
+            isSaveButtonDisabled={!cardName || !cardDescription}
+            onSaveButtonClick={onSaveButtonClick}
+            hasTrunfo={hasTrunfoState}
+            handleSearchButton={handleSearchButton}
+            handleRandomButton={handleRandomButton}
+          />
+          <Card
+            cardName={cardName}
+            cardDescription={cardDescription}
+            cardAttr1={cardAttr1}
+            cardAttr2={cardAttr2}
+            cardAttr3={cardAttr3}
+            cardImage={cardImage}
+            cardRare={cardRare}
+            cardTrunfo={cardTrunfo}
+            cardColor={cardColor}
+          />
+        </div>
+        <SearchArea
+          filterTrunfo={filterTrunfo}
+          filterName={filterName}
+          setFilterName={setFilterName}
+          filterRare={filterRare}
+          setFilterRare={setFilterRare}
+          setFilterTrunfo={setFilterTrunfo}
+        />
+        {cardSaved.length > 0 ? (
+          <List
+            filteredCards={filteredCards}
+            handleDeleteCard={handleDeleteCard}
+          />
+        ) : null}
+      </div>
     </div>
   );
 }
