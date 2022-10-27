@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 import { colors } from "./settings/colors";
+import { rarityColors } from "./settings/rarityColors";
 import { List } from "./components/List";
 import Card from "./components/Card";
 import Form from "./components/Form";
@@ -15,16 +16,21 @@ function App() {
   const [cardAttr2, setCardAttr2] = useState(0);
   const [cardAttr3, setCardAttr3] = useState(0);
   const [cardImage, setCardImage] = useState(null);
-  const [cardRare, setCardRare] = useState("normal");
+  const [cardRare, setCardRare] = useState("comum");
   const [cardTrunfo, setCardTrunfo] = useState(false);
   const [cardSaved, setCardSaved] = useState([]);
   const [hasTrunfoState, setHasTrunfoState] = useState(false);
   const [filterName, setFilterName] = useState("");
   const [filterRare, setFilterRare] = useState("todas");
   const [filterTrunfo, setFilterTrunfo] = useState(false);
+  const [filterTypes, setFilterTypes] = useState("todos");
   const [data, setData] = useState([]);
   const [randomData, setRandomData] = useState([]);
   const [cardColor, setCardColor] = useState({ background: "#fff", color: "#000" });
+  const [cardRarityColor, setCardRarityColor] = useState('#9e9e9e');
+  const [className , setClassName] = useState("cardContainer");
+  const [rareDisabled, setRareDisabled] = useState(false);
+  const [typesList, setTypesList] = useState([]);
 
   const hasTrunfo = () => {
     if (cardSaved.length === 0) setHasTrunfoState(false);
@@ -33,6 +39,34 @@ function App() {
     } else {
       setHasTrunfoState(false);
     }
+  };
+
+  const setAttrPercentsPlus = (percent) => {
+    setCardAttr1((prev) => Math.floor(prev + prev * (percent / 100)));
+    setCardAttr2((prev) => Math.floor(prev + prev * (percent / 100)));
+    setCardAttr3((prev) => Math.floor(prev + prev * (percent / 100)));
+  };
+
+  const setAttrPercentsReset = (percent) => {
+    setCardAttr1((prev) => Math.floor(prev - prev * (percent / 100)));
+    setCardAttr2((prev) => Math.floor(prev - prev * (percent / 100)));
+    setCardAttr3((prev) => Math.floor(prev - prev * (percent / 100)));
+  };
+
+  const handleTrunfo = () => {
+    if (!cardTrunfo) {
+      setClassName("superCarta")
+      setCardRare('')
+      setRareDisabled(true);
+      setAttrPercentsPlus(15);
+    } else {
+      setCardRarityColor('#9e9e9e');
+      setRareDisabled(false);
+      setCardRare('comum');
+      getColor(cardDescription);
+      setClassName("cardContainer")
+      setAttrPercentsReset(11);
+    } 
   };
 
   const onInputChange = (event) => {
@@ -60,7 +94,23 @@ function App() {
     }
     if (name === "cardTrunfo") {
       setCardTrunfo(checked);
+      handleTrunfo();
     }
+  };
+
+  const handleResetStates = () => {
+    setCardAttr1(0);
+    setCardAttr2(0);
+    setCardAttr3(0);
+    setCardName("");
+    setCardDescription("");
+    setCardImage("");
+    setCardRare("comum");
+    setCardTrunfo(false);
+    setCardColor({ background: "#fff", color: "#fff" });
+    setClassName("cardContainer");
+    setRareDisabled(false);
+    setCardRarityColor('#9e9e9e');
   };
 
   const onSaveButtonClick = () => {
@@ -74,17 +124,11 @@ function App() {
       rare: cardRare,
       trunfo: cardTrunfo,
       color: cardColor,
+      class: className,
+      rarityColor: cardRarityColor,
     };
     setCardSaved((prev) => [...prev, card]);
-    setCardAttr1(0);
-    setCardAttr2(0);
-    setCardAttr3(0);
-    setCardName("");
-    setCardDescription("");
-    setCardImage("");
-    setCardRare("normal");
-    setCardTrunfo(false);
-    setCardColor({ background: "#fff", color: "#fff" });
+    handleResetStates();
   };
 
   const handleDeleteCard = (element) => {
@@ -95,16 +139,28 @@ function App() {
   const filteredCardsName = cardSaved.filter((card) =>
     card.name.toLowerCase().includes(filterName.toLowerCase())
   );
-
-  const filteredCardsRare = filteredCardsName.filter(
-    (card) => card.rare === filterRare || filterRare === "todas"
-  );
+  
+  const filteredCardsType = filteredCardsName.filter(
+    (card) => card.description === filterTypes || filterTypes === "todos"
+    );
+    
+    const filteredCardsRare = filteredCardsType.filter(
+      (card) => card.rare === filterRare || filterRare === "todas"
+    );
 
   const filteredCardsTrunfo = cardSaved.filter((card) => card.trunfo === true);
 
   const filteredCards = filterTrunfo ? filteredCardsTrunfo : filteredCardsRare;
 
+  const getTypesList = () => {
+    const types = cardSaved.map((card) => card.description);
+    const typesList = types.filter((type, index) => types.indexOf(type) === index);
+    setTypesList(typesList);
+  };
+
   useEffect(() => {
+    console.log(filterRare);
+    getTypesList();
     hasTrunfo();
   }, [cardSaved]);
 
@@ -150,6 +206,11 @@ function App() {
     else setCardColor({ background: "#fff", color: "#000" });
   };
 
+  const getRarityColor = (rare) => {
+    if (rare) setCardRarityColor(rarityColors[rare]);
+    else setCardRarityColor('#9e9e9e');
+  };
+
   const fetchedPokemon = () => {
     if (data.name) {
       setCardImage(handleNullSprites(data));
@@ -159,7 +220,7 @@ function App() {
       data.types.forEach((type) => {
         setCardDescription((`${type.type.name}`));
       });
-      getColor(data.types[0].type.name);
+      getColor(cardDescription);
     }
   };
 
@@ -170,6 +231,10 @@ function App() {
       setCardImage(null);
     }
   };
+
+  useEffect(() => {
+    getRarityColor(cardRare);
+  }, [cardRare]);
 
   useEffect(() => {
     getColor(cardDescription);
@@ -206,6 +271,7 @@ function App() {
             hasTrunfo={hasTrunfoState}
             handleSearchButton={handleSearchButton}
             handleRandomButton={handleRandomButton}
+            rareDisabled={rareDisabled}
           />
           <Card
             cardName={cardName}
@@ -217,15 +283,20 @@ function App() {
             cardRare={cardRare}
             cardTrunfo={cardTrunfo}
             cardColor={cardColor}
+            className={className}
+            cardRarityColor={cardRarityColor}
           />
         </div>
         <SearchArea
-          filterTrunfo={filterTrunfo}
           filterName={filterName}
           setFilterName={setFilterName}
           filterRare={filterRare}
           setFilterRare={setFilterRare}
+          filterTrunfo={filterTrunfo}
           setFilterTrunfo={setFilterTrunfo}
+          filterTypes={filterTypes}
+          setFilterTypes={setFilterTypes}
+          typesList={typesList}
         />
         {cardSaved.length > 0 ? (
           <List

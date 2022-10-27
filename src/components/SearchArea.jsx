@@ -6,6 +6,9 @@ export function SearchArea({
   filterRare,
   setFilterRare,
   setFilterTrunfo,
+  filterTypes,
+  setFilterTypes,
+  typesList,
 }) {
   return (
     <div className="searchContainer">
@@ -23,22 +26,38 @@ export function SearchArea({
         onChange={(e) => setFilterRare(e.target.value)}
         data-testid="rare-filter">
         <option value="todas">Todas</option>
-        <option value="normal">Normal</option>
-        <option value="raro">Raro</option>
-        <option value="muito raro">Muito Raro</option>
+        <option value="comum">Comum</option>
+        <option value="incomum">Incomum</option>
+        <option value="rara">Rara</option>
+        <option value="epica">Épica</option>
+        <option value="lendaria">Lendária</option>
       </select>
-      <label
-        htmlFor="superTrunfo"
-        for="superTrunfo">
-        Pesquisar Super Trunfo
-        <input
-          type="checkbox"
-          data-testid="trunfo-filter"
-          id="superTrunfo"
-          checked={filterTrunfo}
-          onChange={(e) => setFilterTrunfo(e.target.checked)}
-        />
-      </label>
+      <select
+      value={filterTypes}
+      disabled={filterTrunfo}
+      onChange={(e) => setFilterTypes(e.target.value)}
+      >
+        <option value="todos">Todos</option>
+        {typesList && typesList.map((type) => (
+          <option key={type} value={type}>
+            {type}
+          </option>
+        ))}
+      </select>
+      <div className="searchSuperCartaContainer">
+        <label
+          htmlFor="superTrunfo"
+          for="superTrunfo">
+          Pesquisar Super Carta
+        </label>
+          <input
+            type="checkbox"
+            data-testid="trunfo-filter"
+            id="superTrunfo"
+            checked={filterTrunfo}
+            onChange={(e) => setFilterTrunfo(e.target.checked)}
+          />
+      </div>
     </div>
   );
 }

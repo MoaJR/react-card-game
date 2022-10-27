@@ -12,6 +12,8 @@ function Card({
   cardRare,
   cardTrunfo,
   cardColor,
+  cardRarityColor,
+  className = 'cardContainer',
 }) {
   const firstLetterUpper = (string) => {
     const splittedString = string.split(' ');
@@ -23,19 +25,21 @@ function Card({
 
   return (
     <div 
-      className='cardContainer'
+      className={className}
       style={{ 
-        backgroundColor: cardColor.background,
-        border: `5px solid ${cardColor.color}`,
+        background: cardColor.background,
+        border: `5px solid ${cardRarityColor}`,
         color: cardColor.color,
       }}
     >
       <div>
+      <p data-testid="rare-card" style={{ color: cardRarityColor }}>{cardRare && firstLetterUpper(cardRare)}</p>
+          {cardTrunfo ? <h4 data-testid="trunfo-card">Super Carta</h4> : null}
         <h2 data-testid="name-card">
           {
             cardName && firstLetterUpper(cardName)
           }
-        </h2>
+        </h2>        
        {
         cardImage &&  <img
         className="image"
@@ -44,16 +48,14 @@ function Card({
         data-testid="image-card"
       />
        }
-        <p data-testid="description-card">
+        <p data-testid="attr1-card">{`HP: ${cardAttr1}`}</p>
+        <p data-testid="attr2-card">{`Ataque: ${cardAttr2}`}</p>
+        <p data-testid="attr3-card">{`Defesa: ${cardAttr3}`}</p>
+        <p data-testid="description-card" className='cardType'>
           {
             cardDescription && firstLetterUpper(cardDescription)
           }
         </p>
-        <p data-testid="attr1-card">{`HP: ${cardAttr1}`}</p>
-        <p data-testid="attr2-card">{`Ataque: ${cardAttr2}`}</p>
-        <p data-testid="attr3-card">{`Defesa: ${cardAttr3}`}</p>
-        <p data-testid="rare-card">{cardRare && firstLetterUpper(cardRare)}</p>
-        {cardTrunfo ? <h4 data-testid="trunfo-card">Super Carta</h4> : null}
       </div>
     </div>
   );

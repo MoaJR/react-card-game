@@ -4,14 +4,16 @@
   box-sizing: border-box;
 }
 .App {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  padding: 30px;
-  background-color: rgb(140, 192, 227);
-  width: 100%;
-  height: 100%;
+  &::before{
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(120, 188, 233);
+    z-index: -1;
+  }
 }
 
 .masterContaienr {
@@ -46,7 +48,7 @@ ul {
 }
 
 .deleteButton {
-  background-color: #f44336;
+  background-color: transparent;
   border-radius: 100%;
   border: none;
   color: white;
@@ -56,6 +58,12 @@ ul {
   width: 30px;
   height: 30px;
   font-size: 16px;
-  margin: 4px 2px;
+  margin-top: -5px !important;
+  margin-bottom: 15px;
   cursor: pointer;
+  transition: 0.1s ease-in-out;
+  &:hover {
+    background-color: #f44336;
+    transition: 0.2s ease-in-out;
+  }
 }

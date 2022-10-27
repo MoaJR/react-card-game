@@ -16,6 +16,8 @@ export function List({ filteredCards, handleDeleteCard }) {
             cardRare={card.rare}
             cardTrunfo={card.trunfo}
             cardColor={card.color}
+            className={card.class}
+            cardRarityColor={card.rarityColor}
           />
           <button
             className="deleteButton"
