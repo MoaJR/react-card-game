@@ -299,10 +299,13 @@ function App() {
           typesList={typesList}
         />
         {cardSaved.length > 0 ? (
-          <List
-            filteredCards={filteredCards}
-            handleDeleteCard={handleDeleteCard}
-          />
+          <div className="deckContainer">
+            <h3>Cartas no baralho: {cardSaved.length}</h3>
+            <List
+              filteredCards={filteredCards}
+              handleDeleteCard={handleDeleteCard}
+            />
+          </div>
         ) : null}
       </div>
     </div>
