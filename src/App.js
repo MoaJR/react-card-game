@@ -54,7 +54,7 @@ function App() {
   };
 
   const handleTrunfo = () => {
-    if (!cardTrunfo) {
+    if (cardTrunfo) {
       setClassName("superCarta")
       setCardRare('')
       setRareDisabled(true);
@@ -70,7 +70,7 @@ function App() {
   };
 
   const onInputChange = (event) => {
-    const { name, value, checked } = event.target;
+    const { name, value, checked, label } = event.target;
     if (name === "cardName") {
       setCardName(value);
     }
@@ -94,7 +94,6 @@ function App() {
     }
     if (name === "cardTrunfo") {
       setCardTrunfo(checked);
-      handleTrunfo();
     }
   };
 
@@ -157,12 +156,6 @@ function App() {
     const typesList = types.filter((type, index) => types.indexOf(type) === index);
     setTypesList(typesList);
   };
-
-  useEffect(() => {
-    console.log(filterRare);
-    getTypesList();
-    hasTrunfo();
-  }, [cardSaved]);
 
   const handleSearchButton = async () => {
     const fetchData = async (name) => {
@@ -233,6 +226,15 @@ function App() {
   };
 
   useEffect(() => {
+    getTypesList();
+    hasTrunfo();
+  }, [cardSaved]);
+
+  useEffect(() => {
+    handleTrunfo();
+  }, [cardTrunfo]);
+
+  useEffect(() => {
     getRarityColor(cardRare);
   }, [cardRare]);
 
@@ -300,7 +302,7 @@ function App() {
         />
         {cardSaved.length > 0 ? (
           <div className="deckContainer">
-            <h3>Cartas no baralho: {cardSaved.length}</h3>
+            <h3>Cartas no Baralho: {filteredCards.length}</h3>
             <List
               filteredCards={filteredCards}
               handleDeleteCard={handleDeleteCard}

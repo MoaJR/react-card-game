@@ -108,8 +108,8 @@ function Form({
               <option value="comum">Comum</option>
               <option value="incomum">Incomum</option>
               <option value="rara">Rara</option>
-              <option value="epica">Épica</option>
-              <option value="lendaria">Lendária</option>
+              <option value="épica">Épica</option>
+              <option value="lendária">Lendária</option>
             </select>
         </div>
         {hasTrunfo ? (

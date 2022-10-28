@@ -47,7 +47,7 @@ export function SearchArea({
       <div className="searchSuperCartaContainer">
         <label
           htmlFor="superTrunfo"
-          for="superTrunfo">
+        >
           Pesquisar Super Carta
         </label>
           <input
